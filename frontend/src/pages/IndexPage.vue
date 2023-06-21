@@ -7,7 +7,7 @@
           v-bind:key="btn"
           @click="select(btn)"
           :color="btn == myPoints ? 'deep-orange' : 'primary'"
-          :disabled="store.opened"
+          :disabled="store.opened || spectator"
           >{{ btn }}</q-btn
         >
       </div>
@@ -16,7 +16,14 @@
         <q-btn @click="open()">Open</q-btn>
       </div>
       <div class="col">
-        <q-input debounce="1000" label="Your name:" v-model="userName" />
+        <q-checkbox v-model="spectator" label="I am just a spectator" />
+        <q-input
+          class="q-pl-sm"
+          debounce="1000"
+          label="Your name:"
+          v-model="userName"
+          :disable="spectator"
+        />
       </div>
     </div>
     <div class="row q-pa-sm">
@@ -52,6 +59,7 @@ const store = useGameStore();
 const myId = ref(uuidv4());
 
 var userName = ref('');
+var spectator = ref(false);
 var myPoints = ref(undefined);
 
 watchEffect(function () {
@@ -70,6 +78,12 @@ watchEffect(function () {
     myPoints.value = null;
   }
 });
+var update_spectator = function () {
+  axios.post(`/api/participant/${myId.value}/spectator`, {
+    spectator: spectator.value,
+  });
+  window.localStorage.setItem('spectator', spectator.value);
+};
 
 export default defineComponent({
   name: 'IndexPage',
@@ -89,7 +103,14 @@ export default defineComponent({
       }
       this.connection.send(JSON.stringify({ points: myPoints.value }));
     };
-    return { store, userName, myId, select, myPoints, open, clear };
+    const $q = useQuasar();
+    if ($q.localStorage.has('spectator')) {
+      console.log($q.localStorage.getItem('spectator'));
+      console.log($q.localStorage.getItem('spectator') == 'true');
+      spectator.value = $q.localStorage.getItem('spectator') == 'true';
+    }
+    watchEffect(update_spectator);
+    return { store, userName, myId, select, myPoints, open, clear, spectator };
   },
   created: function () {
     var loc = window.location,
@@ -115,6 +136,7 @@ export default defineComponent({
       if ($q.localStorage.has('userName')) {
         userName.value = $q.localStorage.getItem('userName');
       }
+      update_spectator();
     };
   },
 });

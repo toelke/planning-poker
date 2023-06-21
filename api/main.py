@@ -26,6 +26,10 @@ class UserNameUpdate(BaseModel):
     userName: str
 
 
+class SpectatorUpdate(BaseModel):
+    spectator: bool
+
+
 def setup_logging(name="<app>", level=None):
     """
     Setup logging. Returns a struct-logger.
@@ -80,6 +84,7 @@ class Bus:
 class Participant(BaseModel):
     points: int = None
     userName: str = ""
+    spectator: bool = False
 
 
 class Game:
@@ -93,12 +98,20 @@ class Game:
         self.participants[id].userName = username
         await self.send_state()
 
+    async def update_spectator(self, id, spectator):
+        self.participants[id].spectator = spectator
+        await self.send_state()
+
     async def send_state(self):
         if self.opened:
-            state = {"participants": {k: self.participants[k].dict() for k in self.participants}}
+            state = {"participants": {k: self.participants[k].dict() for k in self.participants if not self.participants[k].spectator}}
         else:
             state = {
-                "participants": {k: {"userName": self.participants[k].userName, "points": (self.participants[k].points is not None)} for k in self.participants}
+                "participants": {
+                    k: {"userName": self.participants[k].userName, "points": (self.participants[k].points is not None)}
+                    for k in self.participants
+                    if not self.participants[k].spectator
+                }
             }
 
         state["opened"] = self.opened
@@ -138,7 +151,7 @@ class Game:
         await self.send_state()
 
     async def open(self):
-        if all((v.points is not None for v in self.participants.values())):
+        if all((v.points is not None for v in self.participants.values() if not v.spectator)):
             self.opened = True
             await self.send_state()
             return True
@@ -169,6 +182,12 @@ def make_app(prefix_router):
     async def userName(id: str, userName: UserNameUpdate):
         await GAME.update_username(id, userName.userName)
         log.info("Received new username", id=id, userName=userName.userName)
+        return "Thanks"
+
+    @prefix_router.post('/participant/{id}/spectator')
+    async def spectator(id: str, spectator: SpectatorUpdate):
+        await GAME.update_spectator(id, spectator.spectator)
+        log.info("Received new spectator status", id=id, spectator=spectator.spectator)
         return "Thanks"
 
     @prefix_router.websocket('/participant/{id}')
