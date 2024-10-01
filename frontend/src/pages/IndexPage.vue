@@ -1,5 +1,14 @@
 <template>
-  <q-page class="col q-pa-sm">
+  <q-page
+    v-bind:class="
+      store.participants[myId].points === false &&
+      Object.keys(store.participants)
+        .filter((key) => key != myId)
+        .every((key) => store.participants[key].points)
+        ? 'bg-red-3 col q-pa-sm'
+        : 'col q-pa-sm'
+    "
+  >
     <div class="row">
       <div class="col">
         <q-btn
@@ -12,8 +21,8 @@
         >
       </div>
       <div class="col">
-        <q-btn @click="clear()">Clear</q-btn>
-        <q-btn @click="open()">Open</q-btn>
+        <q-btn class="bg-white" @click="clear()">Clear</q-btn>
+        <q-btn class="bg-white" @click="open()">Open</q-btn>
       </div>
       <div class="col">
         <q-checkbox v-model="spectator" label="I am just a spectator" />
