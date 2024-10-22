@@ -112,13 +112,6 @@ export default defineComponent({
       }
       this.connection.send(JSON.stringify({ points: myPoints.value }));
     };
-    const $q = useQuasar();
-    if ($q.localStorage.has('spectator')) {
-      console.log($q.localStorage.getItem('spectator'));
-      console.log($q.localStorage.getItem('spectator') == 'true');
-      spectator.value = $q.localStorage.getItem('spectator') == 'true';
-    }
-    watchEffect(update_spectator);
     return { store, userName, myId, select, myPoints, open, clear, spectator };
   },
   created: function () {
@@ -145,7 +138,10 @@ export default defineComponent({
       if ($q.localStorage.has('userName')) {
         userName.value = $q.localStorage.getItem('userName');
       }
-      update_spectator();
+      if ($q.localStorage.has('spectator')) {
+        spectator.value = $q.localStorage.getItem('spectator') == 'true';
+      }
+      watchEffect(update_spectator);
     };
   },
 });
