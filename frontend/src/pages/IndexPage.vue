@@ -40,7 +40,11 @@
       </div>
     </div>
     <div class="row q-pa-sm">
-      <div v-for="id in Object.keys(store.participants)" v-bind:key="id" class="q-pa-sm">
+      <div
+        v-for="id in Object.keys(store.participants)"
+        v-bind:key="id"
+        class="q-pa-sm"
+      >
         <q-card>
           <q-card-section class="bg-primary text-white">
             {{ store.participants[id].userName
