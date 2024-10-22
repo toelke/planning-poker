@@ -5,7 +5,10 @@
       store.participants[myId].points === false &&
       Object.keys(store.participants)
         .filter((key) => key != myId)
-        .every((key) => store.participants[key].points)
+        .every((key) => store.participants[key].points) &&
+      Object.keys(store.participants).filter(
+        (key) => !store.participants[key].spectator
+      ).length > 1
         ? 'bg-red-3 col q-pa-sm'
         : 'col q-pa-sm'
     "
