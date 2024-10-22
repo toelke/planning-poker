@@ -1,6 +1,7 @@
 <template>
   <q-page
     v-bind:class="
+      store.participants[myId] &&
       store.participants[myId].points === false &&
       Object.keys(store.participants)
         .filter((key) => key != myId)
