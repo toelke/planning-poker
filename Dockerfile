@@ -1,4 +1,4 @@
-FROM python:3.13-slim AS python-base
+FROM python:3.14-slim AS python-base
 WORKDIR /app
 COPY ./api/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
