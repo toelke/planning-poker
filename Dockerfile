@@ -4,7 +4,7 @@ COPY ./api/requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 COPY ./api/ /app
 
-FROM node:22 AS frontend-builder
+FROM node:24 AS frontend-builder
 WORKDIR /app
 COPY ./frontend /app
 RUN npm install -g @quasar/cli && npm install && quasar build
