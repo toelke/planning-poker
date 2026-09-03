@@ -2,5 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": [
+        "TODO: remove this rule once typescript-eslint supports TypeScript 7, and let typescript go back to ^7.0.0 in frontend/package.json.",
+        "@typescript-eslint 8.x peer-depends on typescript >=4.8.4 <6.1.0, so any lockfile that resolves typescript 7 makes the `npm install` in the Dockerfile fail with ERESOLVE.",
+        "Track support at https://github.com/typescript-eslint/typescript-eslint/issues/10940"
+      ],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<6.1.0"
+    }
   ]
 }
